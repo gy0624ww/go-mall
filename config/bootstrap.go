@@ -22,7 +22,11 @@ func init() {
 	if err != nil {
 		log.Println("Error loading .env file")
 	}
-	env := os.Getenv("ENV")
+	// env := os.Getenv("ENV")
+	env, exists := os.LookupEnv("ENV")
+	if !exists {
+		panic("ENV is not set")
+	}
 	vp := viper.New()
 	// 根据环境变量 ENV 决定要读取的应用启动配置
 	configFileStream, err := configs.ReadFile("application." + env + ".yaml")

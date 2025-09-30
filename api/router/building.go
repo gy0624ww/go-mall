@@ -18,4 +18,6 @@ func registerBuildingRoutes(rg *gin.RouterGroup) {
 	g.POST("access-log-test", controller.TestAccessLog)
 	// 测试统一响应--返回列表和分页
 	g.GET("response-list", controller.TestResponseList)
+	// 测试gorm的日志
+	g.GET("gorm-logger-test", controller.TestGormLogger)
 }

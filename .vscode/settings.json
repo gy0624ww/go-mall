@@ -1,0 +1,9 @@
+{
+    "go.goroot": "/Users/guanyue/.local/share/mise/installs/go/1.25.1",
+    "go.alternateTools": {
+        "go": "/Users/guanyue/.local/share/mise/shims/go",
+        "gofmt": "${env:HOME}/.gvm/bin/gofmt",
+        "dlv": "/Users/guanyue/.local/share/mise/shims/dlv",
+        "gopls": "/Users/guanyue/.local/share/mise/shims/gopls"
+    }
+}

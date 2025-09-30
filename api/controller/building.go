@@ -5,8 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-study-lab/go-mall/common/app"
+	"github.com/go-study-lab/go-mall/common/errcode"
 	"github.com/go-study-lab/go-mall/common/logger"
 	"github.com/go-study-lab/go-mall/config"
+	"github.com/go-study-lab/go-mall/logic/appservice"
 )
 
 func TestPing(c *gin.Context) {
@@ -30,8 +32,8 @@ func TestAccessLog(c *gin.Context) {
 func TestConfigRead(c *gin.Context) {
 	database := config.Database
 	c.JSON(http.StatusOK, gin.H{
-		"type":     database.Type,
-		"max_life": database.MaxLifeTime,
+		"type":     database.Master.Type,
+		"max_life": database.Master.MaxLifeTime,
 	})
 	return
 }
@@ -54,5 +56,16 @@ func TestResponseList(c *gin.Context) {
 	}
 	pagination.SetTotalRows(2)
 	app.NewResponse(c).SetPagination(pagination).Success(data)
+	return
+}
+
+func TestGormLogger(c *gin.Context) {
+	svc := appservice.NewDemoAppSvc(c)
+	list, err := svc.GetDemoIdentities()
+	if err != nil {
+		app.NewResponse(c).Error(errcode.ErrServer.WithCause(err))
+		return
+	}
+	app.NewResponse(c).Success(list)
 	return
 }

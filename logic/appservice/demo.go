@@ -3,6 +3,11 @@ package appservice
 import (
 	"context"
 
+	"github.com/go-study-lab/go-mall/api/reply"
+	"github.com/go-study-lab/go-mall/api/request"
+	"github.com/go-study-lab/go-mall/common/errcode"
+	"github.com/go-study-lab/go-mall/common/util"
+	"github.com/go-study-lab/go-mall/logic/do"
 	"github.com/go-study-lab/go-mall/logic/domainservice"
 )
 
@@ -38,4 +43,24 @@ func (das *DemoAppSvc) GetDemoIdentities() ([]int64, error) {
 		identities = append(identities, demo.Id)
 	}
 	return identities, nil
+}
+
+func (das *DemoAppSvc) CreateDemoOrder(orderRequest *request.DemoOrderCreate) (*reply.DemoOrder, error) {
+	demoOrderDo := new(do.DemoOrder)
+	err := util.CopyPropetrties(demoOrderDo, orderRequest)
+	if err != nil {
+		errcode.Wrap("请求转换demoOrderDo失败", err)
+		return nil, err
+	}
+	demoOrderDo, err = das.demoDomainSvc.CreateDemoOrder(demoOrderDo)
+	if err != nil {
+		return nil, err
+	}
+	replyDemoOrder := new(reply.DemoOrder)
+	err = util.CopyPropetrties(replyDemoOrder, demoOrderDo)
+	if err != nil {
+		errcode.Wrap("demoOrderDo转换成replyDemoOrder失败", err)
+		return nil, err
+	}
+	return replyDemoOrder, err
 }

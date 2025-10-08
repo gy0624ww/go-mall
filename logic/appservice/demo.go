@@ -6,7 +6,9 @@ import (
 	"github.com/go-study-lab/go-mall/api/reply"
 	"github.com/go-study-lab/go-mall/api/request"
 	"github.com/go-study-lab/go-mall/common/errcode"
+	"github.com/go-study-lab/go-mall/common/logger"
 	"github.com/go-study-lab/go-mall/common/util"
+	"github.com/go-study-lab/go-mall/dal/cache"
 	"github.com/go-study-lab/go-mall/logic/do"
 	"github.com/go-study-lab/go-mall/logic/domainservice"
 )
@@ -56,6 +58,11 @@ func (das *DemoAppSvc) CreateDemoOrder(orderRequest *request.DemoOrderCreate) (*
 	if err != nil {
 		return nil, err
 	}
+	// 设置缓存和读取, 测试功能用，无实际意义
+	cache.SetDemoOrder(das.ctx, demoOrderDo)
+	cacheData, _ := cache.GetDemoOrder(das.ctx, demoOrderDo.OrderNo)
+	logger.Info(das.ctx, "redis data", "data", cacheData)
+
 	replyDemoOrder := new(reply.DemoOrder)
 	err = util.CopyPropetrties(replyDemoOrder, demoOrderDo)
 	if err != nil {

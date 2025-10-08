@@ -39,5 +39,5 @@ func init() {
 	}
 	vp.UnmarshalKey("app", &App)
 	vp.UnmarshalKey("database", &Database)
-	// vp.UnmarshalKey("redis", &Redis)
+	vp.UnmarshalKey("redis", &Redis)
 }

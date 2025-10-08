@@ -1,6 +1,7 @@
 package util
 
 import (
+	"context"
 	"encoding/binary"
 	"hash/fnv"
 	"math/rand"
@@ -97,4 +98,18 @@ func Ip2Long(ip string) (uint32, error) {
 	}
 
 	return binary.BigEndian.Uint32(ipv4), nil
+}
+
+func GetTraceInfoFromCtx(ctx context.Context) (traceId, spanId, pSpanId string) {
+	if ctx.Value("traceid") != nil {
+		traceId = ctx.Value("traceid").(string)
+	}
+	if ctx.Value("spanid") != nil {
+		spanId = ctx.Value("spanid").(string)
+	}
+	if ctx.Value("pspanid") != nil {
+		pSpanId = ctx.Value("pspanid").(string)
+	}
+
+	return
 }

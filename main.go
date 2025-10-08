@@ -4,13 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-study-lab/go-mall/api/router"
 	"github.com/go-study-lab/go-mall/common/enum"
-	"github.com/go-study-lab/go-mall/common/logger"
 	"github.com/go-study-lab/go-mall/config"
 )
 
 func main() {
-	// 初始化logger
-	logger.Init()
 
 	if config.App.Env == enum.ModeProd {
 		gin.SetMode(gin.ReleaseMode)

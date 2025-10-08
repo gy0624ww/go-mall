@@ -21,4 +21,6 @@ func registerBuildingRoutes(rg *gin.RouterGroup) {
 	// 测试gorm的日志
 	g.GET("gorm-logger-test", controller.TestGormLogger)
 	g.POST("create-demo-order", controller.TestCreateDemoOrder)
+	// 测试封装的httptool
+	g.GET("httptool-get-test", controller.TestForHttpToolGet)
 }

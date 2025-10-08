@@ -9,6 +9,7 @@ import (
 	"github.com/go-study-lab/go-mall/common/errcode"
 	"github.com/go-study-lab/go-mall/common/logger"
 	"github.com/go-study-lab/go-mall/config"
+	"github.com/go-study-lab/go-mall/library"
 	"github.com/go-study-lab/go-mall/logic/appservice"
 )
 
@@ -87,4 +88,25 @@ func TestCreateDemoOrder(c *gin.Context) {
 		return
 	}
 	app.NewResponse(c).Success(reply)
+}
+
+func TestForHttpToolGet(c *gin.Context) {
+	ipDetail, err := library.NewWhoisLib(c).GetHostIpDetail()
+	if err != nil {
+		app.NewResponse(c).Error(errcode.ErrServer.WithCause(err))
+		return
+	}
+
+	app.NewResponse(c).Success(ipDetail)
+}
+
+func TestForHttpToolPost(c *gin.Context) {
+
+	orderReply, err := library.NewDemoLib(c).TestPostCreateOrder()
+	if err != nil {
+		app.NewResponse(c).Error(errcode.ErrServer.WithCause(err))
+		return
+	}
+
+	app.NewResponse(c).Success(orderReply)
 }

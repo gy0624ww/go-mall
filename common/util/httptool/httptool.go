@@ -48,6 +48,9 @@ func getHttpClient() *http.Client {
 		return _Client
 	}
 	once.Do(func() {
+		// MaxIdleConnsPerHost：决定了对于单个Host需要维持的连接池大小。该值应该根据性能测试的结果调整。
+		// MaxIdleConns：全局的最大空闲连接，不要比MaxIdleConnsPerHost小，嫌麻烦的话建议不设置或者设置为0 --- 即不限制。
+		// MaxConnsPerHost：对于单个Host允许的最大连接数，包含IdleConns，所以一般大于等于MaxIdleConnsPerHost。设置为等于MaxIdleConnsPerHost，也就是尽可能复用连接池中的连接。另外设置过小，可能会导致并发下降，它的默认值是不做限制。
 		tr := &http.Transport{
 			//Proxy: http.ProxyFromEnvironment,
 			DialContext: (&net.Dialer{

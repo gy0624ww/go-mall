@@ -32,7 +32,7 @@ func (dds *DemoDomainSvc) GetDemos() ([]*do.DemoOrder, error) {
 	demoOrders := make([]*do.DemoOrder, 0, len(demos))
 	for _, demo := range demos {
 		demoOrder := new(do.DemoOrder)
-		util.CopyPropetrties(demoOrder, demo)
+		util.CopyProperties(demoOrder, demo)
 		demoOrders = append(demoOrders, demoOrder)
 	}
 	return demoOrders, nil
@@ -48,7 +48,7 @@ func (dds *DemoDomainSvc) CreateDemoOrder(demoOrder *do.DemoOrder) (*do.DemoOrde
 	}
 	// TODO1: 写订单快照
 	// 这里一般要在事务里写订单商品快照表, 这个等后面做需求时再演示
-	err = util.CopyPropetrties(demoOrder, demoOrderModel)
+	err = util.CopyProperties(demoOrder, demoOrderModel)
 	// 返回领域对象
 	return demoOrder, err
 }

@@ -49,7 +49,7 @@ func (das *DemoAppSvc) GetDemoIdentities() ([]int64, error) {
 
 func (das *DemoAppSvc) CreateDemoOrder(orderRequest *request.DemoOrderCreate) (*reply.DemoOrder, error) {
 	demoOrderDo := new(do.DemoOrder)
-	err := util.CopyPropetrties(demoOrderDo, orderRequest)
+	err := util.CopyProperties(demoOrderDo, orderRequest)
 	if err != nil {
 		errcode.Wrap("请求转换demoOrderDo失败", err)
 		return nil, err
@@ -64,7 +64,7 @@ func (das *DemoAppSvc) CreateDemoOrder(orderRequest *request.DemoOrderCreate) (*
 	logger.Info(das.ctx, "redis data", "data", cacheData)
 
 	replyDemoOrder := new(reply.DemoOrder)
-	err = util.CopyPropetrties(replyDemoOrder, demoOrderDo)
+	err = util.CopyProperties(replyDemoOrder, demoOrderDo)
 	if err != nil {
 		errcode.Wrap("demoOrderDo转换成replyDemoOrder失败", err)
 		return nil, err

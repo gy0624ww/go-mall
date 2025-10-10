@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -109,4 +110,28 @@ func TestForHttpToolPost(c *gin.Context) {
 	}
 
 	app.NewResponse(c).Success(orderReply)
+}
+
+func TestMakeToken(c *gin.Context) {
+	userSvc := appservice.NewUserAppSvc(c)
+	token, err := userSvc.GenToken()
+	if err != nil {
+		if errors.Is(err, errcode.ErrUserInvalid) {
+			logger.Error(c, "invalid user is unable to generate token", err)
+			app.NewResponse(c).Error(errcode.ErrUserInvalid)
+		} else {
+			appErr := err.(*errcode.AppError)
+			app.NewResponse(c).Error(appErr)
+		}
+		return
+	}
+	app.NewResponse(c).Success(token)
+}
+
+func TestAuthToken(c *gin.Context) {
+	app.NewResponse(c).Success(gin.H{
+		"user_id":    c.GetInt64("userId"),
+		"session_id": c.GetString("sessionId"),
+	})
+	return
 }

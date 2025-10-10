@@ -27,7 +27,7 @@ func (demo *DemoDao) GetAllDemos() (demos []*model.DemoOrder, err error) {
 
 func (demo *DemoDao) CreateDemoOrder(demoOrder *do.DemoOrder) (*model.DemoOrder, error) {
 	model := new(model.DemoOrder)
-	err := util.CopyPropetrties(model, demoOrder)
+	err := util.CopyProperties(model, demoOrder)
 	if err != nil {
 		return nil, err
 	}

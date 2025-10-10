@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-study-lab/go-mall/api/controller"
+	"github.com/go-study-lab/go-mall/common/middleware"
 )
 
 func registerBuildingRoutes(rg *gin.RouterGroup) {
@@ -23,4 +24,6 @@ func registerBuildingRoutes(rg *gin.RouterGroup) {
 	g.POST("create-demo-order", controller.TestCreateDemoOrder)
 	// 测试封装的httptool
 	g.GET("httptool-get-test", controller.TestForHttpToolGet)
+	g.GET("token-make-test", controller.TestMakeToken)
+	g.GET("token-auth-test", middleware.AuthUser(), controller.TestAuthToken)
 }

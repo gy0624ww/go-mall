@@ -11,7 +11,7 @@ import (
 
 // CopyPropetrties 把属性从src 复制到dst
 // 参数请传 pointer 类型
-func CopyPropetrties(dst, src interface{}) error {
+func CopyProperties(dst, src interface{}) error {
 	err := copier.CopyWithOption(dst, src, copier.Option{
 		IgnoreEmpty: true,
 		DeepCopy:    true,

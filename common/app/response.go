@@ -1,6 +1,8 @@
 package app
 
 import (
+	"errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-study-lab/go-mall/common/errcode"
 	"github.com/go-study-lab/go-mall/common/logger"
@@ -42,8 +44,13 @@ func (r *response) SuccessOk() {
 }
 
 func (r *response) Error(err *errcode.AppError) {
-	r.Code = err.Code()
-	r.Msg = err.Msg()
+	appErr := errcode.ErrServer.Clone() // 生成一个appErr 用作目标错误类型的判定
+	if !errors.As(err, &appErr) {
+		// 如果err不是appErr的类型, 把它变成appErr
+		appErr = appErr.WithCause(err)
+	}
+	r.Code = appErr.Code()
+	r.Msg = appErr.Msg()
 	requestId := ""
 	if _, exists := r.ctx.Get("traceid"); exists {
 		val, _ := r.ctx.Get("traceid")
@@ -52,5 +59,5 @@ func (r *response) Error(err *errcode.AppError) {
 	r.RequestId = requestId
 	// 兜底记一条响应错误，项目自定义的AppError中有错误链条,方便出错后排查问题
 	logger.Error(r.ctx, "api_resonse_error", "err", err)
-	r.ctx.JSON(err.HttpStatusCode(), r)
+	r.ctx.JSON(appErr.HttpStatusCode(), r)
 }

@@ -19,21 +19,11 @@ func (e *AppError) Error() string {
 	if e == nil {
 		return ""
 	}
-	formattedErr := struct {
-		Code     int    `json:"code"`
-		Msg      string `json:"msg"`
-		Cause    string `json:"cause"`
-		Occurred string `json:"occurred"`
-	}{
-		Code:     e.code,
-		Msg:      e.msg,
-		Occurred: e.occurred,
+	errBytes, err := json.Marshal(e.toStructuredError())
+	if err != nil {
+		return fmt.Sprintf("Error() is error: json marshal error: %v", err)
 	}
-	if e.cause != nil {
-		formattedErr.Cause = e.cause.Error()
-	}
-	errByte, _ := json.Marshal(formattedErr)
-	return string(errByte)
+	return string(errBytes)
 }
 
 func (e *AppError) String() string {
@@ -108,6 +98,43 @@ func getAppErrOccurredInfo() string {
 	funcName := runtime.FuncForPC(pc).Name()
 	triggerInfo := fmt.Sprintf("func: %s, file: %s, line: %d", funcName, file, line)
 	return triggerInfo
+}
+
+// AppendMsg 在Code不变的情况下, 在预定义Msg的基础上追加错误信息
+func (e *AppError) AppendMsg(msg string) *AppError {
+	n := e.Clone()
+	n.msg = fmt.Sprintf("%s, %s", e.msg, msg)
+	return n
+}
+
+// SetMsg 在Code不变的情况下, 重新设置错误信息, 覆盖预定义的Msg
+func (e *AppError) SetMsg(msg string) *AppError {
+	n := e.Clone()
+	n.msg = msg
+	return n
+}
+
+type formattedErr struct {
+	Code     int         `json:"code"`
+	Msg      string      `json:"msg"`
+	Cause    interface{} `json:"cause"`
+	Occurred string      `json:"occurred"`
+}
+
+// toStructuredError 在JSON Encode 前把Error进行格式化
+func (e *AppError) toStructuredError() *formattedErr {
+	fe := new(formattedErr)
+	fe.Code = e.Code()
+	fe.Msg = e.Msg()
+	fe.Occurred = e.occurred
+	if e.cause != nil {
+		if appErr, ok := e.cause.(*AppError); ok {
+			fe.Cause = appErr.toStructuredError()
+		} else {
+			fe.Cause = e.cause.Error()
+		}
+	}
+	return fe
 }
 
 // Wrap 用于逻辑中包装底层函数返回的error 和 WithCause 一样都是为了记录错误链条

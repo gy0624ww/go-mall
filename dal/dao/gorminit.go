@@ -15,7 +15,7 @@ func DB() *gorm.DB {
 }
 
 // DBMaster 返回主库实例
-func DbMaster() *gorm.DB {
+func DBMaster() *gorm.DB {
 	return _DbMaster
 }
 func init() {

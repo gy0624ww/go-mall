@@ -135,3 +135,25 @@ func TestAuthToken(c *gin.Context) {
 	})
 	return
 }
+
+func TestRefreshToken(c *gin.Context) {
+	refreshToken := c.Query("refresh_token")
+	if refreshToken == "" {
+		app.NewResponse(c).Error(errcode.ErrParams)
+		return
+	}
+	userSvc := appservice.NewUserAppSvc(c)
+	token, err := userSvc.TokenRefresh(refreshToken)
+	if err != nil {
+		if errors.Is(err, errcode.ErrTooManyRequests) {
+			// 客户端有并发刷新token
+			app.NewResponse(c).Error(errcode.ErrTooManyRequests)
+			return
+		} else {
+			appErr := err.(*errcode.AppError)
+			app.NewResponse(c).Error(appErr)
+		}
+		return
+	}
+	app.NewResponse(c).Success(token)
+}

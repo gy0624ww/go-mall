@@ -26,4 +26,6 @@ func registerBuildingRoutes(rg *gin.RouterGroup) {
 	g.GET("httptool-get-test", controller.TestForHttpToolGet)
 	g.GET("token-make-test", controller.TestMakeToken)
 	g.GET("token-auth-test", middleware.AuthUser(), controller.TestAuthToken)
+	// 测试刷新Token
+	g.GET("token-refresh-test", controller.TestRefreshToken)
 }

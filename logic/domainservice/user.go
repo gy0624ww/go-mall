@@ -106,3 +106,51 @@ func (us *UserDomainSvc) VerifyAccessToken(accessToken string) (*do.TokenVerify,
 	}
 	return tokenVerify, nil
 }
+
+func (us *UserDomainSvc) RefreshToken(refreshToken string) (*do.TokenInfo, error) {
+	ok, err := cache.LockTokenRefresh(us.ctx, refreshToken)
+	defer cache.UnlockTokenRefresh(us.ctx, refreshToken)
+	if err != nil {
+		err = errcode.Wrap("刷新Token时设置Redis锁发生错误", err)
+		return nil, err
+	}
+	if !ok {
+		err = errcode.ErrTooManyRequests
+		return nil, err
+	}
+	tokenSession, err := cache.GetRefreshToken(us.ctx, refreshToken)
+	if err != nil {
+		logger.Error(us.ctx, "GetRefreshTokenCacheErr", "err", err)
+		// 服务断发生错误一律提示客户端Token有问题
+		// 生产环境可以做好监控日志中这个错误的监控
+		err = errcode.ErrToken
+		return nil, err
+	}
+	// refreshToken没有对应的缓存
+	if tokenSession == nil || tokenSession.UserId == 0 {
+		err = errcode.ErrToken
+		return nil, err
+	}
+	userSession, err := cache.GetUserPlatformSession(us.ctx, tokenSession.UserId, tokenSession.Platform)
+	if err != nil {
+		logger.Error(us.ctx, "GetUserPlatformSessionErr", "err", err)
+		err = errcode.ErrToken
+		return nil, err
+	}
+	// 请求刷新的RefreshToken与UserSession中的不一致, 证明这个RefreshToken已经过时
+	// RefreshToken被窃取或者前端页面刷Token不是串行的互斥操作都有可能造成这种情况
+	if userSession.RefreshToken != refreshToken {
+		// 记一条警告日志
+		logger.Warn(us.ctx, "ExpiredRefreshToken", "requestToken", refreshToken, "newToken", userSession.RefreshToken, "userId", userSession.UserId)
+		// 错误返回Token不正确, 或者更精细化的错误提示已在xxx登录如不是您本人操作请xxx
+		err = errcode.ErrToken
+		return nil, err
+	}
+	// 重新生成Token  因为不是用户主动登录所以sessionID与之前的保持一致
+	tokenInfo, err := us.GenAuthToken(tokenSession.UserId, tokenSession.Platform, tokenSession.SessionId)
+	if err != nil {
+		err = errcode.Wrap("GenAuthTokenErr", err)
+		return nil, err
+	}
+	return tokenInfo, nil
+}

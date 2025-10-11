@@ -30,3 +30,14 @@ func (us *UserAppSvc) GenToken() (*reply.TokenReply, error) {
 	util.CopyProperties(tokenReply, token)
 	return tokenReply, err
 }
+
+func (us *UserAppSvc) TokenRefresh(refreshToken string) (*reply.TokenReply, error) {
+	token, err := us.userDomainSvc.RefreshToken(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+	logger.Info(us.ctx, "refresh token success", "tokenData", token)
+	tokenReply := new(reply.TokenReply)
+	util.CopyProperties(tokenReply, token)
+	return tokenReply, err
+}
